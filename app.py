@@ -12,6 +12,8 @@ from langchain.agents import AgentExecutor, Tool, ZeroShotAgent
 from langchain.chains import RetrievalQA
 from langchain.chains.question_answering import load_qa_chain
 from langchain.memory import ConversationBufferMemory
+
+os.environ['OPENAI_API_KEY'] == st.secrets["OPENAI_API_KEY"]
   
 
 loader = DirectoryLoader('./docs', glob="**/*.pdf", loader_cls=PyPDFLoader)
