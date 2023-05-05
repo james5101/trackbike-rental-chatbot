@@ -14,7 +14,6 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.memory import ConversationBufferMemory
   
 
-# openai.api_key = "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"
 loader = DirectoryLoader('./docs', glob="**/*.pdf", loader_cls=PyPDFLoader)
 documents = loader.load()
 
