@@ -32,10 +32,10 @@ texts = text_splitter.split_documents(documents)
 
 
 embeddings = OpenAIEmbeddings()
-# with st.spinner('Loading embeddings...'):
-index = Pinecone.from_existing_index(index_name, embeddings)
+with st.spinner('Loading embeddings...'):
+    index = Pinecone.from_existing_index(index_name, embeddings)
 # index = Pinecone.from_documents(texts, embeddings, index_name=index_name)
-    # st.success("Embeddings done.", icon="✅")
+    st.success("Embeddings done.", icon="✅")
 
 
 qa = RetrievalQA.from_chain_type(
