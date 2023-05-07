@@ -72,7 +72,7 @@ if "memory" not in st.session_state:
 
 llm_chain = LLMChain(
     llm=OpenAI(
-        temperature=0, openai_api_key=os.environ['OPENAI_API_KEY'], model_name="gpt-3.5-turbo"
+        temperature=0, openai_api_key=os.environ['OPENAI_API_KEY'], model_name="text-davinchi-003"
     ),
     prompt=prompt,
 )
