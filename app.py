@@ -3,7 +3,7 @@ import os
 from langchain.document_loaders import DirectoryLoader
 from langchain.document_loaders import PyPDFLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
+from langchain.vectorstores import FAISS, Pinecone
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.llms import OpenAI
 from langchain.chains import RetrievalQA
@@ -12,8 +12,16 @@ from langchain.agents import AgentExecutor, Tool, ZeroShotAgent
 from langchain.chains import RetrievalQA
 from langchain.chains.question_answering import load_qa_chain
 from langchain.memory import ConversationBufferMemory
+import pinecone
 
-os.environ['OPENAI_API_KEY'] == st.secrets["OPENAI_API_KEY"]
+pinecone.init(
+    api_key=os.environ['PINECONE_API_KEY'],
+    environment='us-east-1-aws',
+)
+index_name = "trackbike-rentals"
+os.environ['OPENAI_API_KEY'] = st.secrets["OPENAI_API_KEY"]
+os.environ['PINECONE_API_KEY'] = st.secrets["PINECONE_API_KEY"]
+
   
 
 loader = DirectoryLoader('./docs', glob="**/*.pdf", loader_cls=PyPDFLoader)
@@ -25,8 +33,10 @@ texts = text_splitter.split_documents(documents)
 
 embeddings = OpenAIEmbeddings()
 # with st.spinner('Loading embeddings...'):
-index = FAISS.from_documents(texts, embeddings)
+index = Pinecone.from_existing_index(index_name, embeddings)
+# index = Pinecone.from_documents(texts, embeddings, index_name=index_name)
     # st.success("Embeddings done.", icon="✅")
+
 
 qa = RetrievalQA.from_chain_type(
                 llm=OpenAI(openai_api_key=os.environ['OPENAI_API_KEY']),
@@ -41,7 +51,7 @@ tools = [
         description="Useful for when you need to answer questions about the aspects asked. Input may be a partial or fully formed question.",
     )
 ]
-prefix = """Have a conversation with a human, answering the following questions as best you can based on the context and memory available. 
+prefix = """Have a conversation with a human, answering the following questions as best you can based only on the context and memory available. 
             You have access to a single tool:"""
 suffix = """Go!"
 {chat_history}
@@ -62,7 +72,7 @@ if "memory" not in st.session_state:
 
 llm_chain = LLMChain(
     llm=OpenAI(
-        temperature=.5, openai_api_key=os.environ['OPENAI_API_KEY'], model_name="gpt-3.5-turbo"
+        temperature=0, openai_api_key=os.environ['OPENAI_API_KEY'], model_name="gpt-3.5-turbo"
     ),
     prompt=prompt,
 )
